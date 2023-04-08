@@ -5,6 +5,8 @@ import "./Gold.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "forge-std/console.sol";
 
+error InsufficientPayment();
+
 /**
  * @title GoldMinter.
  * @author pinalikefruit
@@ -28,5 +30,11 @@ contract GoldMinter {
     constructor(uint256 priceToPay) {
         nft = new Gold(); // Create a new instance
         PRICE_TO_PAY = priceToPay;
+    }
+
+    // Mint 1 NFT (function `mintOne()`)
+    function mintOne() external payable {
+        if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
+        nft.safeMint(msg.sender);
     }
 }

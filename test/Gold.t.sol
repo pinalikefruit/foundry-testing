@@ -20,4 +20,21 @@ contract GoldMinterTest is Test {
         // Now, every call is executed by Bob
         vm.startPrank(bob);
     }
+
+    receive() external payable {}
+
+    function test_constructor() public {
+        assertEq(1.1 ether, nftmin.PRICE_TO_PAY());
+        assertFalse(address(nftmin.nft()) == address(0), "NFT not deployed");
+    }
+
+    function test_mintOne() public {
+        uint256 balanceBefore = address(nftmin).balance;
+        nftmin.mintOne{value: 1.1 ether}();
+        uint256 balanceAfter = address(nftmin).balance;
+
+        assertEq(nftmin.nft().getTotalMinted(), 1);
+        assertLt(balanceBefore, balanceAfter);
+        assertEq(balanceAfter, 1.1 ether);
+    }
 }
