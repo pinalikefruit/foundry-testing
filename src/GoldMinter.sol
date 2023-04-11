@@ -22,7 +22,7 @@ error InsufficientPayment();
 contract GoldMinter {
     // Converts an address into address payable
     using Address for address payable;
-
+    address public owner;
     // NFT Gold price
     uint256 public immutable PRICE_TO_PAY;
     Gold public nft;
@@ -30,11 +30,17 @@ contract GoldMinter {
     constructor(uint256 priceToPay) {
         nft = new Gold(); // Create a new instance
         PRICE_TO_PAY = priceToPay;
+        owner = msg.sender;
     }
 
     // Mint 1 NFT (function `mintOne()`)
     function mintOne() external payable {
         if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
         nft.safeMint(msg.sender);
+    }
+
+    // Withdraw all ETH deposit (`sweepFunds()`)
+    function sweepFunds() public {
+        payable(owner).sendValue(address(this).balance);
     }
 }

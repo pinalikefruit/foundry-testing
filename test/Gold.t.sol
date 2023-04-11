@@ -12,13 +12,12 @@ contract GoldMinterTest is Test {
 
     // Automatically executed prior to each test
     function setUp() public {
-        // Instance of the contract to test
-        nftmin = new GoldMinter(1.1 ether);
-
         // Bob start with 1000 ether
         vm.deal(bob, 1000 ether);
         // Now, every call is executed by Bob
         vm.startPrank(bob);
+        // Instance of the contract to test
+        nftmin = new GoldMinter(1.1 ether);
     }
 
     receive() external payable {}
@@ -36,5 +35,25 @@ contract GoldMinterTest is Test {
         assertEq(nftmin.nft().getTotalMinted(), 1);
         assertLt(balanceBefore, balanceAfter);
         assertEq(balanceAfter, 1.1 ether);
+    }
+
+    function test_sweepFunds() public {
+        uint256 balanceBefore = address(bob).balance;
+
+        vm.deal(alice, 2 ether);
+        changePrank(alice);
+        nftmin.mintOne{value: nftmin.PRICE_TO_PAY()}();
+
+        changePrank(bob);
+        nftmin.sweepFunds();
+        uint256 balanceAfter = address(bob).balance;
+
+        assertGt(balanceAfter, balanceBefore);
+
+        /**
+         * TODO:
+         * - All funds going to Bob
+         * - Alice with changePrank
+         */
     }
 }
