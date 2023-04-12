@@ -56,4 +56,22 @@ contract GoldMinterTest is Test {
          * - Alice with changePrank
          */
     }
+
+    function test_mintMany() public {
+        uint256 amount = 10;
+        uint256 _value = amount * nftmin.PRICE_TO_PAY();
+        nftmin.mintMany{value: _value}(amount);
+
+        assertEq(nftmin.nft().balanceOf(bob), amount);
+
+        _value = (nftmin.MINT_LIMIT() + 1) * nftmin.PRICE_TO_PAY();
+        amount = nftmin.MINT_LIMIT() + 1;
+        vm.expectRevert(AboveMintLimit.selector);
+        nftmin.mintMany{value: _value}(amount);
+        /**
+         * TODO:
+         * - The amount mint must be equal to real mint
+         * - Don't have must mint more than 10 in the same transaction.
+         */
+    }
 }

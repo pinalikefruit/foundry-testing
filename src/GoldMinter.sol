@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "forge-std/console.sol";
 
 error InsufficientPayment();
+error AboveMintLimit();
 
 /**
  * @title GoldMinter.
@@ -25,16 +26,18 @@ contract GoldMinter {
     address public owner;
     // NFT Gold price
     uint256 public immutable PRICE_TO_PAY;
+    uint256 public immutable MINT_LIMIT;
     Gold public nft;
 
     constructor(uint256 priceToPay) {
         nft = new Gold(); // Create a new instance
         PRICE_TO_PAY = priceToPay;
         owner = msg.sender;
+        MINT_LIMIT = 10;
     }
 
     // Mint 1 NFT (function `mintOne()`)
-    function mintOne() external payable {
+    function mintOne() public payable {
         if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
         nft.safeMint(msg.sender);
     }
@@ -42,5 +45,13 @@ contract GoldMinter {
     // Withdraw all ETH deposit (`sweepFunds()`)
     function sweepFunds() public {
         payable(owner).sendValue(address(this).balance);
+    }
+
+    // - Buy more than 1 NFT in bulk/simultaneous, capped at 10 points (`mintMany(uint256)`)
+    function mintMany(uint256 amount) public payable {
+        if (amount > MINT_LIMIT) revert AboveMintLimit();
+        for (uint256 i = 0; i < amount; i++) {
+            mintOne();
+        }
     }
 }
