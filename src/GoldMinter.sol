@@ -39,6 +39,14 @@ contract GoldMinter {
     // Mint 1 NFT (function `mintOne()`)
     function mintOne() public payable {
         if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
+        if (msg.value > PRICE_TO_PAY) {
+            payable(msg.sender).sendValue(msg.value - PRICE_TO_PAY);
+            console.log(
+                "This amount is returned to you %s a %s",
+                msg.value - PRICE_TO_PAY,
+                msg.sender
+            );
+        }
         nft.safeMint(msg.sender);
     }
 
@@ -50,8 +58,17 @@ contract GoldMinter {
     // - Buy more than 1 NFT in bulk/simultaneous, capped at 10 points (`mintMany(uint256)`)
     function mintMany(uint256 amount) public payable {
         if (amount > MINT_LIMIT) revert AboveMintLimit();
+        if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
+        if (msg.value > PRICE_TO_PAY * amount) {
+            payable(msg.sender).sendValue(msg.value - PRICE_TO_PAY * amount);
+            console.log(
+                "This amount is returned to you %s a %s",
+                msg.value - PRICE_TO_PAY,
+                msg.sender
+            );
+        }
         for (uint256 i = 0; i < amount; i++) {
-            mintOne();
+            nft.safeMint(msg.sender);
         }
     }
 }
