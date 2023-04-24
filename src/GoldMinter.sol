@@ -25,7 +25,6 @@ error AlreadyClaimed();
 contract GoldMinter {
     // Converts an address into address payable
     using Address for address payable;
-    address public owner;
     // NFT Gold price
     uint256 public immutable PRICE_TO_PAY;
     uint256 public immutable MINT_LIMIT;
@@ -33,7 +32,9 @@ contract GoldMinter {
 
     mapping(address => uint256) public points;
     mapping(address => bool) public claimed;
+
     Gold public nft;
+    address public owner;
 
     event ClaimedFree(address owner, uint256 tokenId, uint256 points);
 
@@ -58,6 +59,7 @@ contract GoldMinter {
             );
         }
         nft.safeMint(msg.sender);
+        points[msg.sender]++;
     }
 
     // Withdraw all ETH deposit (`sweepFunds()`)
@@ -79,6 +81,7 @@ contract GoldMinter {
         }
         for (uint256 i = 0; i < amount; i++) {
             nft.safeMint(msg.sender);
+            points[msg.sender]++;
         }
     }
 
