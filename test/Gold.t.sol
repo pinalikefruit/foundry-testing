@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import "../src/GoldMinter.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 
-contract GoldMinterTest is Test {
+contract GoldMinterTest is Test /*, IERC721Receiver*/ {
     GoldMinter nftmin;
     address bob = makeAddr("bob");
     address alice = makeAddr("alice");
@@ -17,7 +17,7 @@ contract GoldMinterTest is Test {
         // Now, every call is executed by Bob
         vm.startPrank(bob);
         // Instance of the contract to test
-        nftmin = new GoldMinter(0.25 ether);
+        nftmin = new GoldMinter(0.25 ether, 10);
     }
 
     receive() external payable {}
@@ -91,6 +91,35 @@ contract GoldMinterTest is Test {
          * check that the value that should be charged is equal to the value
          * who receives the contract, even when more is sent.
          *
+         */
+    }
+
+    function test_mintFree() public {
+        vm.deal(bob, 10 ether);
+        uint256 amount = 5;
+        uint256 _value = amount * nftmin.PRICE_TO_PAY();
+        nftmin.mintMany{value: _value}(amount);
+
+        vm.expectRevert(NotEnoughPoints.selector);
+        nftmin.mintFree();
+
+        nftmin.mintMany{value: _value}(amount);
+
+        uint256 balanceBefore = nftmin.nft().balanceOf(bob);
+        nftmin.mintFree();
+        uint256 balanceAfter = nftmin.nft().balanceOf(bob);
+
+        assertEq(balanceBefore + 1, balanceAfter);
+
+        vm.expectRevert(AlreadyClaimed.selector);
+        nftmin.mintFree();
+
+        /** TODO:
+         * - check that it is indeed a free NFT
+         * - check that you can't lie if you have few points
+         * - check that you can't lie twice
+         * tips:
+         * - 2 expectReverts, 3 calls to mintFree, and 1 assert
          */
     }
 }

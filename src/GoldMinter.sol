@@ -7,6 +7,8 @@ import "forge-std/console.sol";
 
 error InsufficientPayment();
 error AboveMintLimit();
+error NotEnoughPoints();
+error AlreadyClaimed();
 
 /**
  * @title GoldMinter.
@@ -27,11 +29,19 @@ contract GoldMinter {
     // NFT Gold price
     uint256 public immutable PRICE_TO_PAY;
     uint256 public immutable MINT_LIMIT;
+    uint8 public immutable PRIZE_THRESHOLD;
+
+    mapping(address => uint256) public points;
+    mapping(address => bool) public claimed;
     Gold public nft;
 
-    constructor(uint256 priceToPay) {
+    event ClaimedFree(address owner, uint256 tokenId, uint256 points);
+
+    constructor(uint256 priceToPay, uint8 prizeThreshold) {
         nft = new Gold(); // Create a new instance
         PRICE_TO_PAY = priceToPay;
+
+        PRIZE_THRESHOLD = prizeThreshold;
         owner = msg.sender;
         MINT_LIMIT = 10;
     }
@@ -70,5 +80,14 @@ contract GoldMinter {
         for (uint256 i = 0; i < amount; i++) {
             nft.safeMint(msg.sender);
         }
+    }
+
+    // Mint 1 free NFT when user has more than 10 points, where 1 mint is 1 point == NFT (`mintFree()`)
+    function mintFree() public {
+        if (points[msg.sender] < PRIZE_THRESHOLD) revert NotEnoughPoints();
+        if (claimed[msg.sender]) revert AlreadyClaimed();
+        claimed[msg.sender] = true;
+        emit ClaimedFree(msg.sender, nft.getTotalMinted(), points[msg.sender]);
+        nft.safeMint(msg.sender);
     }
 }
