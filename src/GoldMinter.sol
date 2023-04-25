@@ -9,6 +9,8 @@ error InsufficientPayment();
 error AboveMintLimit();
 error NotEnoughPoints();
 error AlreadyClaimed();
+error MustMintFirst();
+error MustMintOneAtLeast();
 
 /**
  * @title GoldMinter.
@@ -37,6 +39,12 @@ contract GoldMinter {
     address public owner;
 
     event ClaimedFree(address owner, uint256 tokenId, uint256 points);
+
+    /**
+     *  Constructor
+     * @param priceToPay bid price of 1 NFT
+     * @param prizeThreshold  minimum amount of NFTs to claimed prize
+     */
 
     constructor(uint256 priceToPay, uint8 prizeThreshold) {
         nft = new Gold(); // Create a new instance
@@ -92,5 +100,21 @@ contract GoldMinter {
         claimed[msg.sender] = true;
         emit ClaimedFree(msg.sender, nft.getTotalMinted(), points[msg.sender]);
         nft.safeMint(msg.sender);
+    }
+
+    // * - Mint 1 free NFT for a certain condition
+    //* `Userpoints / nftsTotalMint * 100 > 20` (`mintDeluxe()`)
+    function mintFreeDeluxe() public returns (bool) {
+        if (claimed[msg.sender]) revert AlreadyClaimed();
+        if ((points[msg.sender] * 100) / nft.getTotalMinted() > 20) {
+            nft.safeMint(msg.sender);
+            emit ClaimedFree(
+                msg.sender,
+                nft.getTotalMinted(),
+                points[msg.sender]
+            );
+            return true;
+        }
+        return false;
     }
 }

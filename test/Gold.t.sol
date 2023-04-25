@@ -9,6 +9,9 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
     GoldMinter nftmin;
     address bob = makeAddr("bob");
     address alice = makeAddr("alice");
+    bool exploitActive;
+    uint8 exploitCount;
+    uint8 exploitMaxCount;
 
     // Automatically executed prior to each test
     function setUp() public {
@@ -181,4 +184,65 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
     //     }
     //     return IERC721Receiver.onERC721Received.selector;
     // }
+
+    function test_mintFreeDeluxe() public {
+        uint256 amount = 10;
+        uint256 _value = amount * nftmin.PRICE_TO_PAY();
+        nftmin.mintMany{value: _value}(amount);
+
+        uint256 balanceBefore = nftmin.nft().balanceOf(bob);
+        nftmin.mintFreeDeluxe();
+        uint256 balanceAfter = nftmin.nft().balanceOf(bob);
+        assertEq(balanceBefore + 1, balanceAfter);
+
+        /** TODO:
+         * (UserPoints / TotalMintednfts * 100 > 20).
+         * - minte from different accounts
+         * - check that it delivers 1 nft
+         * - check that you can't lie twice
+         */
+    }
+
+    function getsDeluxe(uint256 points) internal view returns (bool) {
+        points *= 100;
+        points /= nftmin.nft().getTotalMinted();
+
+        return points > 20;
+    }
+
+    function test_fuzz_mintDeluxe(uint256 val, uint256 amount) public {
+        uint256 _value;
+        vm.deal(bob, 100 ether);
+        vm.deal(alice, 100 ether);
+        // limit the fuzz with bound and assumes
+        val = bound(val, nftmin.PRICE_TO_PAY(), 10 ether);
+        amount = bound(amount, 1, 10);
+        vm.assume(val >= nftmin.PRICE_TO_PAY() * amount);
+
+        // mint with my first user x times
+        changePrank(alice);
+        _value = amount * nftmin.PRICE_TO_PAY();
+        nftmin.mintMany{value: _value}(amount);
+        nftmin.mintMany{value: _value}(amount);
+
+        changePrank(bob);
+        nftmin.mintMany{value: _value}(amount);
+        nftmin.mintMany{value: _value}(amount);
+
+        assertEq(getsDeluxe(amount), nftmin.mintFreeDeluxe());
+
+        /** TODO:
+          * - generate the necessary context so that the data can be compared
+              results of the two functions
+          * - lie with two users, different amounts, being that the
+              amount of who will claim respect the condition to claim
+          * - what things can we assume make sense for this test?
+         */
+    }
+    // chisel demo
+    // bool r
+    // uint256 points = 10
+    // uint256 total = 20
+    // r = points/total * 100 > 20
+    // r = points * 100 / total > 20
 }
