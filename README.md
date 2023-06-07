@@ -36,3 +36,26 @@ cd foundry-testing
 ```
 forge test
 ```
+
+## Commands
+
+Install 
+```
+# Instalation
+curl -L [https://foundry.paradigm.xyz](https://foundry.paradigm.xyz/) | bash
+foundryup
+
+#Initialization
+forge init
+
+#If you want to create a new project using a different template, you would pass the --template flag, like so:
+forge init --template https://github.com/foundry-rs/forge-template hello_template
+```
+ Basic commands
+ ```
+
+forge build  # Compile
+forge test   # test
+forge test —mt `funtion_name`
+forge test --match-path `direction_file`
+ ```
