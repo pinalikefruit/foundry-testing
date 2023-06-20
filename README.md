@@ -59,3 +59,27 @@ forge test   # test
 forge test —mt `funtion_name`
 forge test --match-path `direction_file`
  ```
+
+ * Add solidity version 
+ `foundry.toml` 
+ ```
+ solc_version = "0.8.18"
+ ```
+
+ -   [x] Remapping
+
+```shell
+forge remappings
+forge install rari-capital/solmate
+forge update lib/solmate
+forge remove solmate ## Remove library
+
+npm i @openzeppelin/contracts
+```
+
+or 
+``` 
+forge remappings #Then the install dependencies
+forge remappings > remappings.txt
+forge install OpenZeppelin/openzeppelin-contracts
+```
