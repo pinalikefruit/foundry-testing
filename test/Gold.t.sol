@@ -89,7 +89,8 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
 
         assertEq(accumulated, address(nftmin).balance);
 
-        /** TODO:
+        /**
+         * TODO:
          * Define a phantom variable:
          * check that the value that should be charged is equal to the value
          * who receives the contract, even when more is sent.
@@ -117,7 +118,8 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
         vm.expectRevert(AlreadyClaimed.selector);
         nftmin.mintFree();
 
-        /** TODO:
+        /**
+         * TODO:
          * - check that it is indeed a free NFT
          * - check that you can't lie if you have few points
          * - check that you can't lie twice
@@ -195,7 +197,8 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
         uint256 balanceAfter = nftmin.nft().balanceOf(bob);
         assertEq(balanceBefore + 1, balanceAfter);
 
-        /** TODO:
+        /**
+         * TODO:
          * (UserPoints / TotalMintednfts * 100 > 20).
          * - minte from different accounts
          * - check that it delivers 1 nft
@@ -231,12 +234,13 @@ contract GoldMinterTest is Test /*, IERC721Receiver*/ {
 
         assertEq(getsDeluxe(amount), nftmin.mintFreeDeluxe());
 
-        /** TODO:
-          * - generate the necessary context so that the data can be compared
-              results of the two functions
-          * - lie with two users, different amounts, being that the
-              amount of who will claim respect the condition to claim
-          * - what things can we assume make sense for this test?
+        /**
+         * TODO:
+         * - generate the necessary context so that the data can be compared
+         *           results of the two functions
+         * - lie with two users, different amounts, being that the
+         *           amount of who will claim respect the condition to claim
+         * - what things can we assume make sense for this test?
          */
     }
     // chisel demo

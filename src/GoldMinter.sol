@@ -28,6 +28,7 @@ contract GoldMinter {
     // Converts an address into address payable
     using Address for address payable;
     // NFT Gold price
+
     uint256 public immutable PRICE_TO_PAY;
     uint256 public immutable MINT_LIMIT;
     uint8 public immutable PRIZE_THRESHOLD;
@@ -60,11 +61,7 @@ contract GoldMinter {
         if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
         if (msg.value > PRICE_TO_PAY) {
             payable(msg.sender).sendValue(msg.value - PRICE_TO_PAY);
-            console.log(
-                "This amount is returned to you %s a %s",
-                msg.value - PRICE_TO_PAY,
-                msg.sender
-            );
+            console.log("This amount is returned to you %s a %s", msg.value - PRICE_TO_PAY, msg.sender);
         }
         nft.safeMint(msg.sender);
         points[msg.sender]++;
@@ -81,11 +78,7 @@ contract GoldMinter {
         if (msg.value < PRICE_TO_PAY) revert InsufficientPayment();
         if (msg.value > PRICE_TO_PAY * amount) {
             payable(msg.sender).sendValue(msg.value - PRICE_TO_PAY * amount);
-            console.log(
-                "This amount is returned to you %s a %s",
-                msg.value - PRICE_TO_PAY,
-                msg.sender
-            );
+            console.log("This amount is returned to you %s a %s", msg.value - PRICE_TO_PAY, msg.sender);
         }
         for (uint256 i = 0; i < amount; i++) {
             nft.safeMint(msg.sender);
@@ -108,11 +101,7 @@ contract GoldMinter {
         if (claimed[msg.sender]) revert AlreadyClaimed();
         if ((points[msg.sender] * 100) / nft.getTotalMinted() > 20) {
             nft.safeMint(msg.sender);
-            emit ClaimedFree(
-                msg.sender,
-                nft.getTotalMinted(),
-                points[msg.sender]
-            );
+            emit ClaimedFree(msg.sender, nft.getTotalMinted(), points[msg.sender]);
             return true;
         }
         return false;

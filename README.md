@@ -83,3 +83,23 @@ forge remappings #Then the install dependencies
 forge remappings > remappings.txt
 forge install OpenZeppelin/openzeppelin-contracts
 ```
+-   [x] Formatter
+
+```shell
+forge fmt
+```
+
+---
+
+---
+
+-   [x] console (Counter, test, log int)
+
+```shell
+forge test --match-path test/Console.t.sol -vv
+```
+
+forge create [file.sol] --interactive
+forge create [file.sol] --private-key 0x....
+forge script script/DeploySimpleStorage.s.sol --rpc-url http://127.0.0.1:8545 --broadcast --private-key 0x
+cast --to-basae 0x714c2 dec 
